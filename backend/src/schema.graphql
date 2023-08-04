@@ -1,0 +1,7 @@
+type Query {
+    completeChat(input: ChatCompletionInput!): String!
+}
+
+input ChatCompletionInput {
+    prompt: String!
+}

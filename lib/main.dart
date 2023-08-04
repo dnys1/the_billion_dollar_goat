@@ -1,21 +1,40 @@
+import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_flutter/amplify_flutter.dart' hide AWSApiConfig;
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+import 'package:amplify_core/amplify_config.dart';
 
 final openAIProvider = Provider((ref) {
   return OpenAI.instance.build(
     token: '<OPEN AI TOKEN>',
     baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
-    isLog: true,
+    enableLog: true,
   );
 });
 
 final recorderProvider = Provider((ref) => Record());
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final amplifyConfig = AWSAmplifyConfig(
+    api: AWSApiConfig(
+      endpoints: {
+        'graphql': AWSApiEndpointConfig.appSync(
+          endpoint: Uri.parse(
+              'https://vf7ldpesgjftlo6n6cfq3vgrge.appsync-api.us-west-2.amazonaws.com/graphql'),
+          region: 'us-west-2',
+          authMode: const AWSApiAuthorizationMode.apiKey(
+              'da2-7qhptmrpsnckzao3zbfcfht53m'),
+        ),
+      },
+    ),
+  );
+  await Amplify.addPlugin(AmplifyAPI());
+  await Amplify.configure(amplifyConfig.toCli().toString());
   runApp(
     const ProviderScope(child: MyApp()),
   );
@@ -72,6 +91,8 @@ class HomePageViewModel with ChangeNotifier {
   final Record recorder;
   var isRecording = false;
 
+  final textController = TextEditingController();
+
   Future<void> startRecording() async {
     if (!await recorder.hasPermission()) {
       throw Exception('');
@@ -107,6 +128,31 @@ class MyHomePage extends ConsumerWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            TextField(
+              controller: viewModel.textController,
+              maxLines: 5,
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                // final response = Amplify.Query.completeChat(
+                //   input: ChatCompletionInput(prompt: prompt),
+                // );
+                final response = await Amplify.API
+                    .query(
+                      request: GraphQLRequest<String>(
+                        document: r'''
+                          query CompleteChat($prompt: String!) {
+                            completeChat(input: { prompt: $prompt })
+                          }
+                          ''',
+                        variables: {'prompt': viewModel.textController.text},
+                      ),
+                    )
+                    .response;
+                safePrint('Response: $response');
+              },
+              child: const Text('Complete'),
+            ),
             ElevatedButton(
               onPressed: viewModel.isRecording
                   ? () async {
