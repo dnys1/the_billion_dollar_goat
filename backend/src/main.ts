@@ -30,26 +30,11 @@ export class MyStack extends Stack {
 
     const httpDataSource = graphqlApi.addHttpDataSource('HttpDataSource', 'https://api.openai.com');
 
-    graphqlApi.createResolver('Query.completeChat', {
+    httpDataSource.createResolver('Query.completeChat', {
       typeName: 'Query',
       fieldName: 'completeChat',
       runtime: FunctionRuntime.JS_1_0_0,
-      code: Code.fromInline(`
-        export function request(ctx) {
-          return {}
-        }
-
-        export function response(ctx) {
-          return ctx.prev.result
-        }
-      `),
-      pipelineConfig: [
-        httpDataSource.createFunction('Query.compelteChatFn', {
-          name: 'QueryCompleteChatFn',
-          runtime: FunctionRuntime.JS_1_0_0,
-          code: Code.fromAsset(p.join(__dirname, 'Query.completeChat.js')),
-        }),
-      ]
+      code: Code.fromAsset(p.join(__dirname, 'Query.completeChat.js')),
     });
 
   }
