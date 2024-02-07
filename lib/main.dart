@@ -1,4 +1,5 @@
 import 'package:amplify_api/amplify_api.dart';
+import 'package:amplify_core/amplify_config.dart' as config;
 import 'package:amplify_flutter/amplify_flutter.dart' hide AWSApiConfig;
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-import 'package:amplify_core/amplify_config.dart';
 
 final openAIProvider = Provider((ref) {
   return OpenAI.instance.build(
@@ -20,17 +20,20 @@ final recorderProvider = Provider((ref) => Record());
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final amplifyConfig = AWSAmplifyConfig(
-    api: AWSApiConfig(
-      endpoints: {
-        'graphql': AWSApiEndpointConfig.appSync(
+  final amplifyConfig = config.AWSAmplifyConfig(
+    api: config.ApiConfig(
+      endpoints: [
+        config.ApiEndpointConfig.appSync(
+          name: 'graphql',
           endpoint: Uri.parse(
-              'https://vf7ldpesgjftlo6n6cfq3vgrge.appsync-api.us-west-2.amazonaws.com/graphql'),
+            'https://vf7ldpesgjftlo6n6cfq3vgrge.appsync-api.us-west-2.amazonaws.com/graphql',
+          ),
           region: 'us-west-2',
-          authMode: const AWSApiAuthorizationMode.apiKey(
-              'da2-7qhptmrpsnckzao3zbfcfht53m'),
+          authMode: const config.ApiAuthorizationMode.apiKey(
+            'da2-7qhptmrpsnckzao3zbfcfht53m',
+          ),
         ),
-      },
+      ],
     ),
   );
   await Amplify.addPlugin(AmplifyAPI());
