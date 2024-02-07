@@ -19,15 +19,30 @@ dependencies:
 
 dependency_overrides:
   amplify_api:
-    path: ../ad-config/packages/api/amplify_api
+    git:
+      url: https://github.com/aws-amplify/amplify-flutter
+      ref: feat/core/config-revamp
+      path: packages/api/amplify_api
   amplify_api_dart:
-    path: ../ad-config/packages/api/amplify_api_dart
+    git:
+      url: https://github.com/aws-amplify/amplify-flutter
+      ref: feat/core/config-revamp
+      path: packages/api/amplify_api_dart
   amplify_core:
-    path: ../ad-config/packages/amplify_core
+    git:
+      url: https://github.com/aws-amplify/amplify-flutter
+      ref: feat/core/config-revamp
+      path: packages/amplify_core
   amplify_flutter:
-    path: ../ad-config/packages/amplify/amplify_flutter
+    git:
+      url: https://github.com/aws-amplify/amplify-flutter
+      ref: feat/core/config-revamp
+      path: packages/amplify/amplify_flutter
   aws_common:
-    path: ../ad-config/packages/aws_common
+    git:
+      url: https://github.com/aws-amplify/amplify-flutter
+      ref: feat/core/config-revamp
+      path: packages/aws_common
 
 dev_dependencies:
   amplify_lints: ^2.0.0
